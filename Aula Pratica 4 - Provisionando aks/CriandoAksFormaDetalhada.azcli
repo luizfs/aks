@@ -1,0 +1,23 @@
+#Login no azure
+az Login
+
+# Variaveis
+aks=aks-cli-detalhado
+local=eastus
+rg=rg-aks-cli
+sku=Standard_B2s
+
+# Criar Grupo de recursos
+az group create -n $rg -l $local
+
+# Criar AkS com 3 nodes, SKU, AAD habilitado e conta local desativada
+az aks create -g $rg -n $aks --enable-aad --disable-local-accounts --node-count 3 --node-vm-size $sku
+
+# Mostrar detalhes do aks
+az aks show -g $rg -n $aks -o yaml
+
+# Detalhes do Azure RBAC
+az aks show -g $rg -n $aks --query {AzureRBAC:aadProfile} -o yaml
+
+# Ativar Azure RBAC
+az aks update -g $rg -n $aks --enable-azure-rbac

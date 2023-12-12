@@ -1,0 +1,14 @@
+version: '2'
+services:
+  web:
+    image: lfsmoked/primeira-imagem:v3
+    container_name: site3
+    restart: always
+    ports:
+      - '8023:80'
+  web2:
+    image: lfsmoked/primeira-imagem:v2
+    container_name: site2
+    restart: always
+    ports:
+      - '8024:80'
