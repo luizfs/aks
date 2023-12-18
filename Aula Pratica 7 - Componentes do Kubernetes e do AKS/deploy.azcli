@@ -1,0 +1,76 @@
+# Login no azure
+az login
+
+# Parametros
+rg=rg-deploy
+local=eastus2
+aks=aks-deployment
+sku=Standard_B2s
+
+# Criar grupo de recursos
+az group create -n $rg -l $local
+
+# Criar aks
+az aks create -g $rg -n $aks --node-count 1 --node-vm-size $sku
+
+# Obter credenciais do aks
+az aks get-credentials -n $aks -g $rg
+
+# Listar replicas sets
+kubectl get replicaset
+kubectl get rs # comando simplificado
+kubectl get replicaset --all-namespaces
+
+# Aplicar replicaset
+kubectl apply -f replicaset.yaml
+kubectl get pods
+kubectl get pods -l app=app-web --show-labels
+kubectl describe pod app-web-vhtkv
+kubectl describe pod app-web-vhtkv | grep Replica
+
+# Matar um pod 
+kubectl delete pod app-web-vhtkv
+kubectl get pods
+
+# Escalar replicasset (Scale up/ Scale down)
+kubectl scale replicaset app-web --replicas=5 #up
+kubectl scale replicaset app-web --replicas=2 #down
+
+# Excluir replica set
+kubectl delete replicaset app-web
+
+# Listar deployments
+kubectl get deployments
+
+# Aplicar deployments
+kubectl apply -f deployment.yaml
+kubectl get pods
+kubectl get pods --show-labels #mostrar as labels
+
+# Escalar deployments
+kubectl scale deployment deploy-app --replicas=4 #up
+kubectl scale deployment deploy-app --replicas=2 #down
+
+# Descrever deployment
+kubectl describe deployment deploy-app
+
+# Excluir deployment
+kubectl delete -f deployment.yaml
+
+# Services
+# Listar Services
+kubectl get services
+kubectl get svc #comando reduzido
+
+# Aplicar deployment
+kubectl apply -f deployment.yaml
+kubectl get pods --show-labels #mostrar as labels
+
+# Aplicar services
+kubectl apply -f service.yaml
+
+# Requisição no endpoint
+curl http://20.22.161.140
+
+# Excluir grupo de recursos 
+az group delete -n $rg -y

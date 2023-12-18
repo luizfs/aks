@@ -1,0 +1,24 @@
+# Login no azure
+az login
+az aks get-credentials --resource-group rg-storage --name aks-storage
+
+key=GtHYjdZ7gxnpmyphRS4m2/js5CSgopuL0u9UfXRp7/E+lL3cVPRQYKrdmziv629VyVMMpDLrUGR7+ASt6yjSYQ==
+
+# Criar Secret no AKS Cluster
+kubectl create secret generic azure-secret --from-literal=azurestorageaccountname=storageaks2023 --from-literal=azurestorageaccountkey=GtHYjdZ7gxnpmyphRS4m2/js5CSgopuL0u9UfXRp7/E+lL3cVPRQYKrdmziv629VyVMMpDLrUGR7+ASt6yjSYQ==
+
+# Listar secrets
+Kubectl get secrets
+
+# Criar POD
+kubectl apply -f pod-fileshare.yaml
+
+# Listar pods
+kubectl get pods
+kubectl get pods -o jsonpath={.items[*].spec.containers[*].name}
+
+# Listar arquivos do pod
+kubectl exec pod-fileshare --container pod-fileshare -- sh -c "ls /mnt/azure"
+
+# Criar arquivo no storage pelo container
+kubectl exec pod-fileshare --container pod-fileshare -- sh -c "echo \"Criado no container\" > /mnt/azure/arq-container.txt"

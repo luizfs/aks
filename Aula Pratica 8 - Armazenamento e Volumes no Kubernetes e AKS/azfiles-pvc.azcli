@@ -1,0 +1,51 @@
+# Login no azure
+az login
+
+# Variáveis
+storage=storageaksfile
+rg=rg-storage1
+local=eastus2
+fileshare=aksshare
+aks=aks-storage
+sku=Standard_B2s
+
+# Criar grupo de recursos
+az group create -n $rg -l $local
+
+# Criar local storage
+az storage account create -n $storage -g $rg -l $local --sku Standard_LRS
+
+# Obter connection string do azure storage account
+connectionstring=$(az storage account show-connection-string -n $storage -g $rg -o tsv)
+
+# Criar File Share
+az storage share create -n $fileshare --connection-string $connectionstring
+
+# Obter chave do storage account
+az storage account keys list -g $rg --account-name $storage
+az storage account keys list -g $rg --account-name $storage --query "[0].value" -o tsv
+key=$(az storage account keys list -g $rg --account-name $storage --query "[0].value" -o tsv)
+
+# Criar aks
+az aks create -n $aks -g $rg --node-count 1 --node-vm-size $sku
+
+# Obter credenciais
+az aks get-credentials -n $aks -g $rg
+
+# Criar segredo com Key storage account
+Kubectl create secret generic azure-secret --from-literal=azurestorageaccountname=$storage --from-literal=azureaccountkey=$key
+
+# Listar secrets
+kubectl get secrets
+
+# Listar storage classes
+kubectl get storageclass
+
+# Criar storage class
+kubectl apply -f sv-fileshare.yaml
+
+# Listar os volumes persistentes (PV)
+kubectl get persistentvolume
+kubectl get pv
+
+# Criar PV
